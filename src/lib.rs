@@ -1,9 +1,8 @@
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum State {
     Idle,
-    MovingUp, 
-    MovingDown, 
+    MovingUp,
+    MovingDown,
     DoorsOpen,
 }
 
@@ -17,16 +16,11 @@ pub enum ElevatorError {
     EmptyQueue,
 }
 
-pub struct Status {
+#[derive(Debug, Clone)]
+pub struct Elevator {
     pub floor: i32,
     pub state: State,
     pub queue: Vec<i32>,
-}
-
-pub struct Elevator {
-    floor: i32,
-    state: State,
-    queue: Vec<i32>,
 }
 
 impl Elevator {
@@ -34,7 +28,11 @@ impl Elevator {
         if !(0..=5).contains(&start_floor) {
             return Err(ElevatorError::InvalidFloor(start_floor));
         }
-        Ok(Self { floor: start_floor, state: State::Idle, queue: vec![] })
+        Ok(Self {
+            floor: start_floor,
+            state: State::Idle,
+            queue: vec![],
+        })
     }
 
     pub fn floor(&self) -> i32 {
@@ -103,15 +101,13 @@ impl Elevator {
     pub fn open_doors(&mut self) -> Result<(), ElevatorError> {
         match self.state {
             State::DoorsOpen => Err(ElevatorError::DoorsAlreadyOpen),
-            State::MovingDown | State::MovingUp => {
-                Err(ElevatorError::CannotOpenWhileMoving)
-            }, 
+            State::MovingDown | State::MovingUp => Err(ElevatorError::CannotOpenWhileMoving),
             State::Idle => {
                 self.state = State::DoorsOpen;
                 Ok(())
             }
-         }
-    } 
+        }
+    }
 
     pub fn close_doors(&mut self) -> Result<(), ElevatorError> {
         match self.state {
@@ -132,12 +128,7 @@ impl Elevator {
         }
     }
 
-    pub fn status(&mut self) -> Status {
-        Status {
-            floor: self.floor,
-            state: self.state,
-            queue: self.queue.clone(),
-        }
+    pub fn status(&mut self) -> Self {
+        self.clone()
     }
-
 }
